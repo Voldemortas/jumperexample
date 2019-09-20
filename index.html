@@ -1,0 +1,82 @@
+<style>
+    canvas {
+        background-color: bisque;
+    }
+</style>
+<button onclick="x += 10;">></button> <br />
+<button onclick="x -= 10;"><</button> <br />
+<button onclick="jump()">JUMP!</button><br />
+<canvas id="jumper" width="450" height="650">neveikia ;(</canvas>
+<script>
+    let c = document.getElementById('jumper')
+    let ctx = c.getContext('2d')
+    let base = 0
+    let user = 0
+    let x = 210
+    let starting = 0
+    let start = 0
+    let acceleration = -120
+    let finished = true
+    let tick = 0
+    let speed = 0
+    let platforms = []
+    for (let i = 0; i < 7; i++) {
+        platforms.push(Math.random() * 200)
+    }
+    const h = 648
+    function draw() {
+        ctx.clearRect(0, 0, c.width, c.height)
+        let y = h - user * 100
+        ctx.beginPath()
+        ctx.rect(x, y - 50, 30, 50)
+        ctx.strokeStyle = 'red'
+        ctx.fillStyle = 'red'
+        ctx.fill()
+        ctx.stroke()
+        for (let i = 0; i < 7; i++) {
+            ctx.beginPath()
+            ctx.strokeStyle = 'black'
+            ctx.moveTo(platforms[i], h - i * 100)
+            ctx.lineTo(platforms[i] + 250, h - i * 100)
+            ctx.stroke()
+        }
+    }
+    function jump() {
+        if (!finished) {
+            return
+        }
+        finished = false
+        speed = starting
+        start = Date.now()
+    }
+    function move() {
+        let next = Date.now()
+        let dif = next - start
+        start = next
+        draw()
+        if (Math.floor(user) > base) {
+            base++
+        }
+        speed += (acceleration * dif) / 1000
+        user += (speed * dif) / 10000
+        if (
+            user < base &&
+            x > platforms[base] - 30 &&
+            x < platforms[base] + 250
+        ) {
+            user = base
+            finished = true
+            speed = 0
+        } else if (user < base) {
+            base--
+            finised = false
+        }
+    }
+    function calculate(height, time) {
+        acceleration = -(2 * height) / (time * time)
+        starting = -acceleration * time
+    }
+    calculate(15, 0.25)
+    draw()
+    setInterval(move, 1)
+</script>
